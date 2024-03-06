@@ -1,5 +1,6 @@
 package kata
 
-func Sum(a, b int) int {
-  return a + b
+
+func Permutations(s string) []string {
+  return make([]string, 0)
 }
