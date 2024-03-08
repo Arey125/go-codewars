@@ -46,8 +46,8 @@ func Order(level int, queue []Person) []int {
 		if len(res) != 0 && res[len(res)-1] != currentPosition {
 			res = append(res, currentPosition)
 		}
-		sortedQueue = removeFromSortedQueue(sortedQueue, ind)
 		aboard = append(aboard, sortedQueue[ind].Item.To)
+		sortedQueue = removeFromSortedQueue(sortedQueue, ind)
 	}
 
 	drop := func(ind int) {
@@ -64,7 +64,7 @@ func Order(level int, queue []Person) []int {
 			targetPosition = sortedQueue[indexOfFirstInQueue].Item.From
 		}
 
-		boardInd := findFirstToBoard(sortedQueue, currentPosition, targetPosition)
+		boardInd := findFirstToBoard(sortedQueue, currentPosition, targetPosition, len(aboard) == 0)
 		if len(aboard) == 0 {
 			board(boardInd)
 			continue
@@ -72,10 +72,20 @@ func Order(level int, queue []Person) []int {
 
 		dropInd := findFirstToDrop(aboard, currentPosition, targetPosition)
 
+    if boardInd == -1 {
+      drop(dropInd)
+      continue
+    }
+
+    if dropInd >= len(aboard) {
+      board(boardInd)
+      continue
+    }
+
 		distanceToBoarding := math.Abs(float64(sortedQueue[boardInd].Item.From - currentPosition))
 		distanceToDropping := math.Abs(float64(aboard[dropInd] - currentPosition))
 
-    // TODO
+		// TODO
 		if distanceToBoarding < distanceToDropping {
 			board(boardInd)
 		} else {
@@ -105,7 +115,7 @@ func findFirstInQueue(sortedQueue []PersonRecord) int {
 	return res
 }
 
-func findFirstToBoard(sortedQueue []PersonRecord, currentPosition, targetPosition int) int {
+func findFirstToBoard(sortedQueue []PersonRecord, currentPosition, targetPosition int, aboardIsEmpty bool) int {
 	fmt.Println("first to board")
 	fmt.Println(sortedQueue)
 
@@ -114,12 +124,31 @@ func findFirstToBoard(sortedQueue []PersonRecord, currentPosition, targetPositio
 	})
 
 	if targetPosition < currentPosition || found {
-		fmt.Println("down", ind)
-		return ind
+		if aboardIsEmpty {
+			fmt.Println("down", ind)
+			return ind
+		}
+		for i := ind; i >= 0; i-- {
+			if sortedQueue[i].Item.To < sortedQueue[i].Item.From {
+				fmt.Println("down", i)
+				return i
+			}
+		}
+		return -1
 	}
 
-	fmt.Println("up", ind + 1)
-	return ind + 1
+	if aboardIsEmpty {
+		fmt.Println("up", ind+1)
+		return ind + 1
+	}
+
+	for i := ind + 1; i < len(sortedQueue); i++ {
+		if sortedQueue[i].Item.To > sortedQueue[i].Item.From {
+			return i
+		}
+	}
+
+  return -1
 }
 
 func findFirstToDrop(aboard []int, currentPosition, targetPosition int) int {
