@@ -6,6 +6,7 @@ import (
 )
 
 func main() {
-  fmt.Println(Sum(2, 3))
-  fmt.Println(5)
+	snailMap := [][]int{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}
+	fmt.Println(Snail(snailMap))
+	fmt.Println([]int{1, 2, 3, 6, 9, 8, 7, 4, 5})
 }
